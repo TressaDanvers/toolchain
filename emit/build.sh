@@ -67,7 +67,7 @@ case "${1:-}" in
     checksum $BIN_SHA ./build/stages/emit-stage-2-a || err-fatal check checksum
     info check emit-stage-2-a == emit-stage-2-b
     cmp -s ./build/stages/emit-stage-2-a ./build/stages/emit-stage-2-b || err-fatal check emit-stage-2-a != emit-stage-2-b
-    pass check
+    pass check emit
     ;;
   clean)
     info clean emit
