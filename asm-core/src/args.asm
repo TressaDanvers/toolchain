@@ -133,10 +133,10 @@ db "unrecognized command-line option" 00
 :args.s.many
 db "too many input files" 00
 :args.s.versiontext
-db "asm-core v0.1.0" 0A 00
+db "asm-core v0.1.1" 0A 00
 :args.s.helptext
 db "Usage: asm-core [options] [file...]" 0A
-db "Assemble risc source into amd64 machine code." 0A
+db "Assemble RISC source into amd64 machine code." 0A
 db 0A
 db "Options:" 0A
 db "  --help       Display this information." 0A

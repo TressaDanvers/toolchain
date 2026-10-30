@@ -1,4 +1,5 @@
-# Risc
+# amd64/RISC
+A minimal instruction set modeled after the RISC format for the amd64 cpu architecture.
 
 #### Operands
 | Kind | Meaning |

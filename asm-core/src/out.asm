@@ -110,12 +110,7 @@ mov rdx r13
 mov [r15+i80] rdi
 cmp rdi i0
 je :out.finish.stdout
-mov [r15+i72] rax
 let edx 0x1B6
-cmp rax i0
-je :out.finish.open
-let edx 0x1FF
-:out.finish.open
 let esi 0x241
 call :io.open
 cmp rdx i0
