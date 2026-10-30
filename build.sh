@@ -13,6 +13,7 @@ case "${1:-}" in
     ;;
   deploy)
     sh ./emit/build.sh deploy
+    sh ./asm-core/build.sh deploy
     ;;
   check)
     sh ./emit/build.sh check

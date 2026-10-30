@@ -4,6 +4,8 @@ set -eu
 cd "$(dirname "$0")"
 build-script-arg "$@"
 
+PREFIX=${PREFIX:-/usr/local}
+
 ASM_CORE_SOURCES="./src/main.asm ./src/io.asm ./src/text.asm ./src/lex.asm ./src/sym.asm
   ./src/err.asm ./src/lit.asm ./src/operand.asm ./src/out.asm ./src/enc.asm
   ./src/insn.asm ./src/asm.asm ./src/args.asm ./src/src.asm ./src/tables.asm"
@@ -28,7 +30,10 @@ case "${1:-}" in
     pass build asm-core
     ;;
   deploy)
-    err-fatal deploy n/a
+    [ -f ./build/stages/asm-core-stage-3 ] || err-fatal deploy project is not built
+    mkdir -p "$PREFIX/bin" || err-fatal deploy "$PREFIX/bin"
+    info deploy asm-core
+    cp ./build/stages/asm-core-stage-3 "$PREFIX/bin/asm-core" || err-fatal deploy "$PREFIX/bin/asm-core"
     ;;
   check)
     check-sh ./build.sh
