@@ -2,7 +2,7 @@
 set -eu
 
 cd "$(dirname "$0")"
-build-script-arg "$@"
+build-script-arg "$@" 2>/dev/null || [ "$1" = "hex" ] || err-fatal usage "build.sh [hex|deploy|check|clean]"
 
 PREFIX=${PREFIX:-/usr/local}
 
@@ -27,6 +27,8 @@ emit_b() {
   }'
 }
 
+asm() { ../asm-core/build/stages/asm-core-stage-3 "$@"; }
+
 checksum() {
   s=$(shasum -a 256 < "$2")
   [ "${s%% *}" = "$1" ]
@@ -37,6 +39,14 @@ BIN_SHA=6e59c483efe2b3635404db391ed291c7c6da88ccf146afc902475cc3a175e022
 
 case "${1:-}" in
   "")
+    [ -f ../asm-core/build/stages/asm-core-stage-3 ] || err-fatal tool "asm-core stage 3 not found, build before continuing"
+    mkdir -p ./build/stages || err-fatal build directories
+    info build ./build/stages/emit-stage-3
+    asm ./src/emit.asm -o ./build/stages/emit-stage-3 || err-fatal build ./build/stages/emit-stage-3
+    chmod +x ./build/stages/emit-stage-3 || err-fatal build ./build/stages/emit-stage-3
+    pass build emit stage 3
+    ;;
+  hex)
     mkdir -p ./build/stages || err-fatal build directories
     info build ./build/stages/emit-stage-1-a
     emit_a < ./src/emit.hex > ./build/stages/emit-stage-1-a || err-fatal build stage 1-a
@@ -50,13 +60,13 @@ case "${1:-}" in
     info build ./build/stages/emit-stage-2-b
     ./build/stages/emit-stage-1-b < ./src/emit.hex > ./build/stages/emit-stage-2-b || err-fatal build stage 2-b
     chmod +x ./build/stages/emit-stage-2-b || err-fatal build stage 2-b
-    pass build emit
+    pass build emit stage 1 2
     ;;
   deploy)
-    [ -f ./build/stages/emit-stage-2-a ] || err-fatal deploy project is not built
+    [ -f ./build/stages/emit-stage-3 ] || err-fatal deploy project is not built
     mkdir -p "$PREFIX/bin" || err-fatal deploy "$PREFIX/bin"
     info deploy emit
-    cp ./build/stages/emit-stage-2-a "$PREFIX/bin/emit" || err-fatal deploy "$PREFIX/bin/emit"
+    cp ./build/stages/emit-stage-3 "$PREFIX/bin/emit" || err-fatal deploy "$PREFIX/bin/emit"
     ;;
   check)
     [ -f ./build/stages/emit-stage-2-a ] || err-fatal check project is not built
@@ -67,6 +77,8 @@ case "${1:-}" in
     checksum $BIN_SHA ./build/stages/emit-stage-2-a || err-fatal check checksum
     info check emit-stage-2-a == emit-stage-2-b
     cmp -s ./build/stages/emit-stage-2-a ./build/stages/emit-stage-2-b || err-fatal check emit-stage-2-a != emit-stage-2-b
+    info check stage 3 emits stage 2
+    [ "$(./build/stages/emit-stage-3 ./src/emit.hex)" = "$(cat ./build/stages/emit-stage-2-a)" ] || err-fatal check stage 3 does not emit stage 2
     pass check emit
     ;;
   clean)
