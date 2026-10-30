@@ -50,7 +50,7 @@ case "${1:-}" in
     info build ./build/stages/emit-stage-2-b
     ./build/stages/emit-stage-1-b < ./src/emit.hex > ./build/stages/emit-stage-2-b || err-fatal build stage 2-b
     chmod +x ./build/stages/emit-stage-2-b || err-fatal build stage 2-b
-    pass build
+    pass build emit
     ;;
   deploy)
     [ -f ./build/stages/emit-stage-2-a ] || err-fatal deploy project is not built
@@ -70,7 +70,7 @@ case "${1:-}" in
     pass check
     ;;
   clean)
-    info clean ./build
+    info clean emit
     rm -rf ./build || err-fatal clean ./build
     ;;
 esac
